@@ -118,3 +118,11 @@ body.bright-mode header{
 #themeToggle{
   right: 0;
 }
+.editNote {
+  float: right;
+  margin-right: 10px;
+  background-color: transparent;
+  color: #F9BD34;
+  border: none;
+  cursor: pointer;
+} 

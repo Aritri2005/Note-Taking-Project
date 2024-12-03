@@ -3,17 +3,24 @@ const addText = document.getElementById('addText');
 const addNoteButton = document.getElementById('addNote');
 const notesDiv = document.getElementById('notes');
 
+let isEditing = false; 
+
 showNotes();
 
-function addNotes(){
+function addNotes() {
+    
+    if (isEditing) {
+        return;
+    }
+
     let notes = localStorage.getItem('notes');
-    if(notes === null){
+    if (notes === null) {
         notes = [];
-    }else{
+    } else {
         notes = JSON.parse(notes);
     }
 
-    if(addText.value == ''){
+    if (addText.value == '') {
         alert('Add your note');
         return;
     }
@@ -21,7 +28,7 @@ function addNotes(){
     const noteObj = {
         title: addTitle.value,
         text: addText.value,
-    }
+    };
     addTitle.value = '';
     addText.value = '';
     notes.push(noteObj);
@@ -29,41 +36,90 @@ function addNotes(){
     showNotes();
 }
 
-function showNotes(){
+function showNotes() {
     let notesHTML = '';
     let notes = localStorage.getItem('notes');
-    if(notes === null){
+    if (notes === null) {
         return;
-    }else{
+    } else {
         notes = JSON.parse(notes);
     }
-    for(let i=0; i<notes.length; i++){
-        notesHTML += `<div class="note">
-                    <button class="deleteNote" id=${i} onclick="deleteNote(${i})">Delete</button>
-                    <span class="title"><strong style="font-size: 20px;">${notes[i].title === "" ? 'Note' : notes[i].title}</strong></span>
-                    <div class="text">${notes[i].text}</div>
-                </div>
-        `
+    for (let i = 0; i < notes.length; i++) {
+        notesHTML += `
+            <div class="note">
+                <button class="deleteNote" id=${i} onclick="deleteNote(${i})">Delete</button>
+                <button class="editNote" id="edit-${i}" onclick="editNote(${i})">Edit</button>
+                <span class="title"><strong style="font-size: 20px;">${notes[i].title === "" ? 'Note' : notes[i].title}</strong></span>
+                <div class="text">${notes[i].text}</div>
+            </div>
+        `;
     }
     notesDiv.innerHTML = notesHTML;
 }
 
-function deleteNote(ind){
+function deleteNote(ind) {
     let notes = localStorage.getItem('notes');
-    if(notes === null){
+    if (notes === null) {
         return;
-    }else{
+    } else {
         notes = JSON.parse(notes);
     }
     notes.splice(ind, 1);
     localStorage.setItem('notes', JSON.stringify(notes));
     showNotes();
 }
-addNoteButton.addEventListener('click', addNotes);
 
+function editNote(ind) {
+    let notes = localStorage.getItem('notes');
+    if (notes === null) {
+        return;
+    } else {
+        notes = JSON.parse(notes);
+    }
+
+    
+    addTitle.value = notes[ind].title;
+    addText.value = notes[ind].text;
+
+    
+    addNoteButton.textContent = "Update";
+    isEditing = true;
+
+    
+    addNoteButton.onclick = function () {
+        updateNote(ind);
+    };
+}
+
+function updateNote(ind) {
+    let notes = localStorage.getItem('notes');
+    if (notes === null) {
+        return;
+    } else {
+        notes = JSON.parse(notes);
+    }
+
+    
+    notes[ind].title = addTitle.value;
+    notes[ind].text = addText.value;
+
+    
+    localStorage.setItem('notes', JSON.stringify(notes));
+
+   
+    addTitle.value = '';
+    addText.value = '';
+    addNoteButton.textContent = "Add"; 
+    addNoteButton.onclick = addNotes; 
+    isEditing = false;
+
+    showNotes(); 
+}
+
+addNoteButton.addEventListener('click', addNotes);
 const themeToggle = document.getElementById('themeToggle');
 
-// Toggle theme between dark and bright mode
+
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('bright-mode');
     themeToggle.textContent = 
@@ -71,3 +127,6 @@ themeToggle.addEventListener('click', () => {
         ? 'Switch to Dark Mode' 
         : 'Switch to Bright Mode';
 });
+
+
+ 
